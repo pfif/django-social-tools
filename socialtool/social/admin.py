@@ -16,6 +16,7 @@ def mark_approved(modeladmin, request, queryset):
 mark_approved.short_description = 'Mark selected posts as approved'
 
 
+
 class BaseAdmin(admin.ModelAdmin):
 
     class Media:
@@ -28,7 +29,7 @@ class BaseAdmin(admin.ModelAdmin):
 class SocialAdmin(BaseAdmin):
     search_fields = ('handle', 'content',)
     list_display = ('created_at', 'high_priority', 'get_handle', 'post_source', 'get_image', 'content', 'messages', 'notes', '_rudness_level')
-    list_filter = ('account', 'search_term', 'high_priority', SocialPostStatusFilter, SocialPostImageFilter, 'created_at', 'entry_allowed')
+    list_filter = ('account', 'search_term', 'high_priority', SocialPostStatusFilter, SocialPostImageFilter, 'created_at', 'entry_allowed', '_rudness_level')
     list_editable = ('notes', )
 
     list_per_page = 25
@@ -107,6 +108,8 @@ class ForbiddenWordAdmin(BaseAdmin):
     list_display_links = list()
     list_display_links.append('word')
     list_filter = ('active', 'rudness_level')
+    list_editable = ('active', 'rudness_level')
+    fields = ('active', 'word', 'rudness_level')
 
 admin.site.register(get_model('social', 'socialpost'), SocialAdmin)
 admin.site.register(get_model('social', 'searchterm'), BaseAdmin)

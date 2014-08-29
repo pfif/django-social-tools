@@ -169,6 +169,7 @@ class AbstractSocialPost(models.Model):
 
 
     _rudness_level = models.IntegerField(blank=True, default=None) #Internal property. 0 if no forbidden words found or the level of the "rudder" word found or Null if the level has never been determined
+    _rudness_level.verbose_name = "Rudness level"
 
     def check_rudness_level(self):
         """
