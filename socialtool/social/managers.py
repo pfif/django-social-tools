@@ -22,3 +22,8 @@ class AllSocialPostManager(models.Manager):
 
     def get_queryset(self):
         return super(AllSocialPostManager, self).get_queryset()
+
+    def check_rudnesslevel(self, queryset):
+        for socialpost in queryset:
+            socialpost.check_rudness_level()
+            socialpost.save()

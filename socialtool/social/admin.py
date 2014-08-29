@@ -33,7 +33,7 @@ class SocialAdmin(BaseAdmin):
 
     list_per_page = 25
 
-    actions = [mark_deleted, ]
+    actions = [mark_deleted, 'check_rudnesslevel_selected']
 
     fieldsets = (
         ('Post data', {
@@ -94,6 +94,9 @@ class SocialAdmin(BaseAdmin):
 
         return super(SocialAdmin, self).get_queryset(request)
 
+    def check_rudnesslevel_selected(self, request, queryset):
+        get_model('social', 'socialpost').everything.check_rudnesslevel(queryset)
+    check_rudnesslevel_selected.short_description = "Check rudness for selected posts"
 
 class MessageAdmin(BaseAdmin):
     list_display = ('account', 'type', 'copy')
