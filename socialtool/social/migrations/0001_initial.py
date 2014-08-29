@@ -58,6 +58,15 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal(u'social', ['BannedUser'])
 
+        # Adding model 'ForbiddenWord'
+        db.create_table(u'social_forbiddenword', (
+            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('active', self.gf('django.db.models.fields.BooleanField')(default=True)),
+            ('word', self.gf('django.db.models.fields.SlugField')(max_length=50)),
+            ('rudness_level', self.gf('django.db.models.fields.IntegerField')()),
+        ))
+        db.send_create_signal(u'social', ['ForbiddenWord'])
+
         # Adding model 'SearchTerm'
         db.create_table(u'social_searchterm', (
             (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -93,6 +102,7 @@ class Migration(SchemaMigration):
             ('sent_id', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
             ('disallowed_reason', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
             ('raw_object', self.gf('django.db.models.fields.BinaryField')(null=True, blank=True)),
+            ('_rudness_level', self.gf('django.db.models.fields.IntegerField')(default=None, blank=True)),
         ))
         db.send_create_signal(u'social', ['SocialPost'])
 
@@ -112,6 +122,9 @@ class Migration(SchemaMigration):
 
         # Deleting model 'BannedUser'
         db.delete_table(u'social_banneduser')
+
+        # Deleting model 'ForbiddenWord'
+        db.delete_table(u'social_forbiddenword')
 
         # Deleting model 'SearchTerm'
         db.delete_table(u'social_searchterm')
@@ -164,6 +177,13 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'reason': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'})
         },
+        u'social.forbiddenword': {
+            'Meta': {'object_name': 'ForbiddenWord'},
+            'active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'rudness_level': ('django.db.models.fields.IntegerField', [], {}),
+            'word': ('django.db.models.fields.SlugField', [], {'max_length': '50'})
+        },
         u'social.marketaccount': {
             'Meta': {'object_name': 'MarketAccount'},
             'access_token_key': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
@@ -193,6 +213,7 @@ class Migration(SchemaMigration):
         },
         u'social.socialpost': {
             'Meta': {'ordering': "('-high_priority', '-created_at', '-followers', 'handle')", 'object_name': 'SocialPost'},
+            '_rudness_level': ('django.db.models.fields.IntegerField', [], {'default': 'None', 'blank': 'True'}),
             'account': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['social.MarketAccount']", 'null': 'True', 'blank': 'True'}),
             'approved': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'content': ('django.db.models.fields.CharField', [], {'max_length': '1000'}),

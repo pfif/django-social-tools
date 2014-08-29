@@ -16,6 +16,8 @@ class TrackedTerms(abstract_models.AbstractTrackedTerms):
 class BannedUser(abstract_models.AbstractBannedUser):
     pass
 
+class ForbiddenWord(abstract_models.AbstractForbiddenWord):
+    pass
 
 class SearchTerm(abstract_models.AbstractSearchTerm):
     pass

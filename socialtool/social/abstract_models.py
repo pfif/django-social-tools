@@ -83,6 +83,20 @@ class AbstractBannedUser(models.Model):
     class Meta:
         abstract = True
 
+class AbstractForbiddenWord(models.Model):
+    """
+        Social Post's content is search against these words.
+        A rudness level is then given to it according to the words that have been found and their level.
+    """
+    active = models.BooleanField(default=True)
+    word = models.SlugField()
+    rudness_level = models.IntegerField()
+    
+    def __unicode__(self):
+        return self.word
+
+    class Meta:
+        abstract = True
 
 class AbstractSearchTerm(models.Model):
     active = models.BooleanField(default=False)
@@ -153,3 +167,28 @@ class AbstractSocialPost(models.Model):
         return get_model('social','socialpost').everything.filter(handle=self.handle).exclude(image_url=None).exclude(uid=self.uid).count()
 
 
+    _rudness_level = models.IntegerField(blank=True, default=None) #Internal property. 0 if no forbidden words found or the level of the "rudder" word found or Null if the level has never been determined
+
+    def check_rudness_level(self):
+        """
+        Define the highest level of the forbidden words of this post
+        """
+        self._rudness_level = 0
+        forbidden_words = {fw['word']: fw['rudness_level'] for fw in get_model('social', 'forbiddenword').objects.filter(active=True).values('word', 'rudness_level')}
+        for word in forbidden_words.keys():
+            if word.lower() in self.content.lower():
+                self._rudness_level = max(forbidden_words[word], self._rudness_level)
+        
+
+    @property
+    def rudness_level(self):
+        """
+        Property method to access _rudness_level. 
+        If the level has never been determined, it asks for its determination. It is then the responsability of the user to save that level with the rest of the model
+        """
+        must_save = False
+        if(self._rudness_level == None):
+            self.check_rudness_level()
+            must_save = True
+
+        return [self._rudness_level, must_save]

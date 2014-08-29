@@ -27,7 +27,7 @@ class BaseAdmin(admin.ModelAdmin):
 
 class SocialAdmin(BaseAdmin):
     search_fields = ('handle', 'content',)
-    list_display = ('created_at', 'high_priority', 'get_handle', 'post_source', 'get_image', 'content', 'messages', 'notes')
+    list_display = ('created_at', 'high_priority', 'get_handle', 'post_source', 'get_image', 'content', 'messages', 'notes', '_rudness_level')
     list_filter = ('account', 'search_term', 'high_priority', SocialPostStatusFilter, SocialPostImageFilter, 'created_at', 'entry_allowed')
     list_editable = ('notes', )
 
@@ -99,6 +99,11 @@ class MessageAdmin(BaseAdmin):
     list_display = ('account', 'type', 'copy')
     list_filter = ('account', 'type')
 
+class ForbiddenWordAdmin(BaseAdmin):
+    list_display = ('active', 'word', 'rudness_level')
+    list_display_links = list()
+    list_display_links.append('word')
+    list_filter = ('active', 'rudness_level')
 
 admin.site.register(get_model('social', 'socialpost'), SocialAdmin)
 admin.site.register(get_model('social', 'searchterm'), BaseAdmin)
@@ -106,3 +111,4 @@ admin.site.register(get_model('social', 'banneduser'), BaseAdmin)
 admin.site.register(get_model('social', 'message'), MessageAdmin)
 admin.site.register(get_model('social', 'marketaccount'), BaseAdmin)
 admin.site.register(get_model('social', 'trackedterms'), BaseAdmin)
+admin.site.register(get_model('social', 'forbiddenword'), ForbiddenWordAdmin)

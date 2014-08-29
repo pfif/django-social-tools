@@ -65,6 +65,7 @@ class Command(BaseCommand):
                         raw_object=pickle.dumps(post._obj),
                         search_term=term,
                     )
+                    obj.check_rudness_level()
 
                     try:
                         post = get_model('social', 'socialpost').everything.get(uid=obj.uid)
