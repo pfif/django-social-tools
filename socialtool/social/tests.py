@@ -1,6 +1,8 @@
 from django.test import TestCase
 from socialtool.loading import get_model
 from datetime import datetime
+from django.test.utils import override_settings
+from django.conf import settings
 
 #A very ironic test case about java
 class ForbiddenWordTagTestCase(TestCase):
@@ -31,6 +33,7 @@ class ForbiddenWordTagTestCase(TestCase):
         uid = 'javaisland',
         handle = 'javalover',
         search_term = self.searchterm,
+        entry_allowed = True,
         _rudness_level = 0
       )
       self.socialpost.save()
@@ -95,3 +98,23 @@ class ForbiddenWordTagTestCase(TestCase):
       self.socialpost.content = "JsP new version out"
       self.socialpost.check_rudness_level()
       self.assertEqual(self.socialpost.rudness_level[0], 10)
+
+    @override_settings(THRESHOLD_RUDNESS_LEVEL = 5)
+    def test_underthreshold(self):
+      self.socialpost.content = "java developper job in London, 35k, contact via MP"
+      self.socialpost.check_rudness_level()
+      self.assertEqual(self.socialpost.entry_allowed, True)
+
+    @override_settings(THRESHOLD_RUDNESS_LEVEL = 5)
+    def test_overthreshold(self):
+      self.socialpost.content = "JSP is the bomb #java"
+      self.socialpost.check_rudness_level()
+      self.assertEqual(self.socialpost.entry_allowed, False)
+    
+    @override_settings(THRESHOLD_RUDNESS_LEVEL = 5)
+    def test_nothresholdspecified(self):
+      del settings.THRESHOLD_RUDNESS_LEVEL 
+      self.socialpost.content = "JSP is the bomb #java"
+      self.socialpost.check_rudness_level()
+      self.assertEqual(self.socialpost.entry_allowed, True)
+

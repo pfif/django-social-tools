@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from socialtool.loading import get_classes, get_model
+from django.conf import settings
 
 SocialPostManager, AllSocialPostManager = get_classes('social.managers', ('SocialPostManager', 'AllSocialPostManager'))
 
@@ -178,7 +179,12 @@ class AbstractSocialPost(models.Model):
         for word in forbidden_words.keys():
             if word.lower() in self.content.lower():
                 self._rudness_level = max(forbidden_words[word], self._rudness_level)
-        
+
+        try:
+            if self._rudness_level >= settings.THRESHOLD_RUDNESS_LEVEL :
+              self.entry_allowed = False
+        except AttributeError:
+          pass #if THRESHOLD_RUDNESS_LEVEL is not specified, do nothing
 
     @property
     def rudness_level(self):
